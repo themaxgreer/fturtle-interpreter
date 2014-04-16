@@ -1,0 +1,18 @@
+func poly_aux(n, angle) {
+  if (n > 0) {
+     move(1);
+     rotate(angle);
+     poly_aux(n-1, angle)
+  } else 0
+}
+
+func poly(sides) {
+  let (angle := 360/sides) {
+    poly_aux(sides, angle)
+  }
+}
+
+func main() {
+  pendown(1);
+  poly(80)
+}    

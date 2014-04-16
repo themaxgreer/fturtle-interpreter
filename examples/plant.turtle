@@ -1,0 +1,59 @@
+#
+# Plant
+#
+# L-system
+#
+# start: X
+# rules:
+#   X -> F-[[X]+X]+F[+FX]-X
+#   F -> FF
+# semantics:
+#   F means draw forward
+#   + and - mean turn left/right by 25 degrees
+#   X has no drawing action
+#
+
+func X(depth) {
+  if (depth > 0)
+    let (d := depth-1, angle := 25) {
+      F(d);
+      rotate(-angle);
+      pushstate();
+      pushstate();
+      X(d);
+      popstate();
+      rotate(angle);
+      X(d);
+      popstate();
+      rotate(angle);
+      F(d);
+      pushstate();
+      rotate(angle);
+      F(d);
+      X(d);
+      popstate();
+      rotate(-angle);
+      X(d)
+    }
+  else
+    0
+}
+
+func F(depth) {
+  if (depth > 0) {
+     F(depth-1); 
+     F(depth-1)
+  } else {
+     pendown(1);
+     move(1);
+     pendown(0)
+  }
+}
+
+func main() {
+  rotate(90);
+  pendown(0);
+  let (depth := 7) {
+    X(depth)
+  }
+}

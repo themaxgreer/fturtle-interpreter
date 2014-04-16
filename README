@@ -1,0 +1,44 @@
+Name: Max Greer
+Email: themaxgreer@gmail.com
+List of files:		
+			Makefile
+			Expr.hpp
+			ftparse.ypp
+			ftlex.lpp
+			SymbolTable.hpp
+			turtle.pl
+			fturtle.pdf (for a much clearer description of project)
+			./examples folder (contains all of the .turtle files)
+			./images folder (contains what the images should look like)
+			README
+Description:
+fturtle is a program that after being put through a lexical analyzer and 
+parsed, runs a main function that interprets the commands in the .turtle file
+to create a turtle graphics image.
+
+To build enter this command:
+make
+
+To clean riffraff enter this command:
+make clean
+
+To Run enter this command:
+./fturtle < $(turtle name).turtle | ./turtle.pl | convert pgm:- $(turtle name).png
+-where turtle name is one of the examples in the examples folder, i.e. circle.turtle
+
+Dependencies (What you need to run): flex, bison, imagemagick
+
+What will be outputted from the run command:
+an image matching the interpretted .turtle file
+
+
+Thanks to:
+Dr. Cochran (ezekiel.vancouver.wsu.edu) for the base yacc/bison grammar and 
+lex/flex spec.
+
+----------------------------------------------------------------------------------------------
+Note: I made everything into expressions including built-in functions and user defined functions.
+I treated them all as being part of the CallExpr class where I evaluate the arguments passed to
+the function. The only output that is messed up is when you interpret star.turtle, I assume it is
+due to the pendown function taking an argument of false and I am still outputting D due to it 
+being part of my built-in functions.

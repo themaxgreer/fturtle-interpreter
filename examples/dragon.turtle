@@ -1,0 +1,39 @@
+#
+# Dragon curve
+#
+# L-System:
+#  start: FX
+#  rules:
+#     X -> X+YF
+#     Y -> FX-Y
+#  semantics:
+#     F means draw forward
+#     + and - mean turn left/right by 90 degrees
+#     X and Y have no drawing action
+#
+
+func X(depth, dist) {
+  if (depth > 0) {
+    X(depth-1, dist);
+    rotate(+90);
+    Y(depth-1, dist);
+    move(dist)
+  } else 0
+}
+
+func Y(depth, dist) {
+  if (depth > 0) {
+    move(dist);
+    X(depth-1, dist);
+    rotate(-90);
+    Y(depth-1, dist)
+  } else 0
+}
+
+func main() {
+  pendown(1);
+  let (depth := 13, dist := 1) {
+    move(dist);
+    X(depth, dist)
+  }
+}

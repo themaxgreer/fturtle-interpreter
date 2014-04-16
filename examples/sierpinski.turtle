@@ -1,0 +1,36 @@
+#
+# Sierpinski's Triangle
+#
+# L-System:
+#  start: A
+#  rules:
+#     A -> B-A-B
+#     B -> A+B+A
+#  semantics:
+#     A and B mean move forward
+#     + and - mean turn left/right by 60 degrees
+#
+
+func A(depth, dist) {  # rule A -> B-A-B
+  if (depth > 0)
+    let (d := depth-1) {
+      B(d,dist); rotate(-60);
+      A(d,dist); rotate(-60);
+      B(d,dist)
+    }
+  else move(dist)
+}
+
+func B(depth, dist) { # B -> A+B+A
+  if (depth > 0)
+    let (d := depth-1) {
+      A(d,dist); rotate(60);
+      B(d,dist); rotate(60);
+      A(d,dist)
+    } 
+  else move(dist)
+}
+
+func main() {A(6,1)}  # start symbol A
+       
+      

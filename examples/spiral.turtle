@@ -1,0 +1,17 @@
+#
+# From http://en.wikipedia.org/wiki/File:Turtle-Graphics_Polyspiral.svg
+#
+
+func f(dist, segs) {
+  if (segs > 0) {
+    move(dist);
+    let (angle := 89.5, incr := 0.1) {
+      rotate(-angle);
+      f(dist + incr, segs-1)
+    }
+  } else 0
+}
+
+func main() {
+  f(0.01, 184)
+}

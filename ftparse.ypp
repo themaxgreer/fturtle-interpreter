@@ -1,0 +1,127 @@
+%{
+#include "Expr.hpp"
+#include "SymbolTable.hpp"
+#include <list>
+#include <string>
+#include <iostream>
+
+extern int yylex();
+extern void yyerror(const char *msg); 
+SymbolTable root(0);
+%}
+
+%union {
+	double num;
+	char *id;	
+	Expr *e;
+	Symbol *sym;
+	std::list<Expr *> *a;
+	std::list<Symbol *> *l;
+	std::list<std::string> *p;
+}
+
+%token <id> ID
+%token <num> NUM
+%token FUNC ASSIGN IF ELSE LET
+%type <e> expr
+%type <e> block
+%type <sym> lexical
+%type <sym> func
+%type <a> actuals actual_list expr_list
+%type <l> lexicals
+%type <p> formals formal_list
+%left ASSIGN
+%right ELSE
+%left OR
+%left AND
+%right NOT
+%nonassoc '=' NE
+%nonassoc '<' LE '>' GE
+%left '+' '-'
+%left '*' '/'
+%right UMINUS
+%%
+prog           : funcs
+               ;
+
+funcs          : funcs func						{root.put($2->name, $2->value);}
+               |
+               ;
+
+func           : FUNC ID '(' formals ')' block				{$$ = new Symbol($2, new UserFuncExpr(*$4, $6));}
+               ;
+
+formals        : formal_list						
+               |							{$$ = new std::list<std::string>;}
+               ;
+
+formal_list    : formal_list ',' ID					{$1->push_back($3); $$ = $1;}
+               | ID							{$$ = new std::list<std::string>;$$->push_back($1);}
+               ;
+
+expr           : expr OR expr						{$$ = new BinaryExpr(BinaryExpr::OrOp,$1,$3);}
+               | expr AND expr						{$$ = new BinaryExpr(BinaryExpr::AndOp,$1,$3);}
+               | NOT expr						{$$ = new UnaryExpr(UnaryExpr::NotOp, $2);}
+               | expr '=' expr						{$$ = new BinaryExpr(BinaryExpr::EqOp,$1,$3);}
+               | expr NE expr						{$$ = new BinaryExpr(BinaryExpr::NeOp,$1,$3);}
+               | expr '<' expr						{$$ = new BinaryExpr(BinaryExpr::LtOp,$1,$3);}
+               | expr LE expr						{$$ = new BinaryExpr(BinaryExpr::LeOp,$1,$3);}
+               | expr '>' expr						{$$ = new BinaryExpr(BinaryExpr::GtOp,$1,$3);}
+               | expr GE expr						{$$ = new BinaryExpr(BinaryExpr::GeOp,$1,$3);}
+               | expr '+' expr						{$$ = new BinaryExpr(BinaryExpr::PlusOp,$1,$3);}
+               | expr '-' expr						{$$ = new BinaryExpr(BinaryExpr::MinusOp,$1,$3);}
+               | expr '*' expr						{$$ = new BinaryExpr(BinaryExpr::MultOp,$1,$3);}
+               | expr '/' expr						{$$ = new BinaryExpr(BinaryExpr::DivOp,$1,$3);}
+               | '-' expr  %prec UMINUS					{$$ = new UnaryExpr(UnaryExpr::NegOp, $2);}
+               | '+' expr  %prec UMINUS					{$$ = $2;}
+               | '(' expr ')'						{$$ = $2;}
+               | IF '(' expr ')' expr ELSE expr 			{$$ = new IfExpr($3,$5,$7);}
+               | LET '(' lexicals ')' block				{$$ = new LetExpr(*$3, $5);}
+               | ID '(' actuals ')'					{$$ = new CallExpr($1, *$3);}
+               | ID							{$$ = new VarExpr($1);}
+               | NUM							{$$ = new NumExpr($1);}
+               | block
+               ;
+
+block          : '{' expr_list '}'					{$$ = new BlockExpr(*$2);}
+               ;
+
+expr_list      : expr_list ';' expr					{$$ = $1; $1->push_back($3);}
+               | expr							{$$ = new std::list<Expr*>; $$->push_back($1);}
+               ;
+
+lexicals       : lexicals ',' lexical					{$$ = $1; $$->push_back($3);}
+               | lexical						{$$ = new std::list<Symbol *>; $$->push_back($1);}
+               ;
+
+lexical        : ID ASSIGN expr						{$$ = new Symbol($1, $3);}
+               ;
+
+actuals        : actual_list						{$$ = $1;}
+               |							{$$ = new std::list<Expr*>;}
+               ;
+
+actual_list    : actual_list ',' expr 					{$1->push_back($3); $$ = $1;}
+               | expr							{$$ = new std::list<Expr*>; $$->push_back($1);}
+               ;
+
+%%
+void yyerror(const char *msg) {
+  fprintf(stderr, "%s\n", msg);
+  exit(1);
+}
+int main(void) {
+	yyparse();
+	root.put("home", new BIFuncExpr("H"));
+	root.put("penup", new BIFuncExpr("U"));
+	root.put("pendown", new BIFuncExpr("D"));
+	root.put("move", new BIFuncExpr("M"));
+	root.put("rotate", new BIFuncExpr("R"));
+	root.put("pushstate", new BIFuncExpr("["));
+	root.put("popstate", new BIFuncExpr("]"));
+	EvalVisitor v(&root);
+	std::list<Expr *> args;
+	CallExpr m = CallExpr("main", args);
+	m.accept(&v);
+	return 0;
+}

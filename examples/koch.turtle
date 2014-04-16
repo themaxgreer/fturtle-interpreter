@@ -1,0 +1,44 @@
+#
+# Tweeked Koch Flake
+# Made of 6 (Tweeked) Koch Curves in hexagonal pattern.
+#
+# Koch Curve
+#
+# L-System:
+#  start: F
+#  rules:
+#     F -> F+F-F-F+F
+#  semantics:
+#     F means draw forward
+#     + and - mean turn left/right by 90 degrees
+#
+#
+
+func F(depth, dist) {
+  if (depth <= 0)
+    move(dist)
+  else let (d := depth-1, u := 1.3*dist) {
+    F(d, u);
+    rotate(-90);
+    F(d, u);
+    rotate(+90);
+    F(d, u);
+    rotate(+91);  # tweek
+    F(d, u);
+    rotate(-90);
+    F(d, u)
+  }    
+}
+
+func flake(count, depth, dist) {
+  if (count > 0) {
+    F(depth,dist);
+    rotate(60);
+    flake(count-1, depth, dist)
+  } else 0
+}
+
+func main() {
+  pendown(1);
+  flake(6,4,1)
+}

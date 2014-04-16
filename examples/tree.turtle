@@ -1,0 +1,26 @@
+func foo(depth) {
+  if (depth > 0) {
+    foo(depth-1);
+    foo(depth-1)
+  } else
+    move(1.0)
+}
+
+func bar(depth) {
+  if (depth > 0) {
+    foo(depth-1);
+    pushstate();
+    rotate(45.0);
+    bar(depth-1);  # draw leaf here?
+    popstate();
+    rotate(-45.0);
+    bar(depth-1)
+  } else
+    move(1.0)
+}
+
+func main() {
+  rotate(90);
+  pendown(true);
+  bar(8)
+}

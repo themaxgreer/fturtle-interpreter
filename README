@@ -6,7 +6,8 @@ List of files:
 			ftparse.ypp
 			ftlex.lpp
 			SymbolTable.hpp
-			turtle.pl
+			fturtle (executable)
+			turtle.pl (Perl script to handle image creation
 			fturtle.pdf (for a much clearer description of project)
 			./examples folder (contains all of the .turtle files)
 			./images folder (contains what the images should look like)
@@ -34,7 +35,7 @@ an image matching the interpretted .turtle file
 
 Thanks to:
 Dr. Cochran (ezekiel.vancouver.wsu.edu) for the base yacc/bison grammar and 
-lex/flex spec.
+lex/flex spec and the perl script to handle image creation.
 
 ----------------------------------------------------------------------------------------------
 Note: I made everything into expressions including built-in functions and user defined functions.
